@@ -11,6 +11,22 @@ var uid;
 
 let currentCard = null;
 
+firebase.messaging().getToken({
+	vapidKey:
+		"BIgSdQPWwlFHj3XMWX8EMgMx1k5OnMR_Ajc4z9mmjaij_StiySJlg6hxQNdXBTUufi0uXew5nQDrORcAmS3Bl_I",
+});
+
+firebase.messaging().onMessage((payload) => {
+	const notification = new Notification(payload.notification.title, {
+		body: payload.notification.body,
+	});
+
+	// close the notification after 10 seconds
+	setTimeout(() => {
+		notification.close();
+	}, 5 * 1000);
+});
+
 firebase.auth().onAuthStateChanged((user) => {
 	if (user) {
 		uid = user.uid;
