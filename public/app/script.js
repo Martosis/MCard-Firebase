@@ -14,6 +14,16 @@ let currentCard = null;
 firebase.auth().onAuthStateChanged((user) => {
 	if (user) {
 		uid = user.uid;
+
+		var tasks = firebase
+			.database()
+			.ref("tasks/" + uid)
+			.orderByChild("due")
+			.on("child_added", (snap) => {
+				const values = snap.val();
+				const card = addCardDisplay([values.course, values.name, values.due]);
+				card.id = snap.key;
+			});
 	} else {
 		window.location = "../";
 	}
@@ -30,7 +40,7 @@ logoutButton.addEventListener("click", () => {
 
 addButton.addEventListener("click", toggleDisplay);
 
-background.addEventListener("click", (event) => {
+background.addEventListener("mousedown", (event) => {
 	if (event.target != background) return;
 	toggleDisplay();
 });
@@ -63,36 +73,9 @@ confirmAddButton.addEventListener("click", () => {
 		inputFields.item(i).value = "";
 	}
 
+	const date = new Date(inputs[2]);
+
 	if (currentCard == null) {
-		const card = document.createElement("div");
-		card.className = "card";
-
-		card.innerHTML = justKillMeAlready();
-
-		const textDiv = card.querySelector(".card-text");
-
-		textDiv.querySelector(".course").innerText = inputs[0];
-		textDiv.querySelector("h3").innerText = inputs[1];
-
-		const date = new Date(inputs[2]);
-
-		textDiv.querySelector(".due").innerText = date.toLocaleTimeString("en-US", {
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-
-		const check = card.querySelector(".check");
-		check.addEventListener("click", () => {
-			handleCardClick(check);
-		});
-
-		const edit = card.querySelector(".edit");
-		edit.addEventListener("click", () => {
-			handleEdit(edit);
-		});
 		firebase
 			.database()
 			.ref("tasks/" + uid)
@@ -100,18 +83,11 @@ confirmAddButton.addEventListener("click", () => {
 				course: inputs[0],
 				name: inputs[1],
 				due: date.getTime(),
-			})
-			.then((snap) => {
-				card.id = snap.key;
 			});
-
-		container.append(card);
 	} else {
 		const textDiv = currentCard.querySelector(".card-text");
 		textDiv.querySelector(".course").innerText = inputs[0];
 		textDiv.querySelector("h3").innerText = inputs[1];
-
-		const date = new Date(inputs[2]);
 
 		textDiv.querySelector(".due").innerText = date.toLocaleTimeString("en-US", {
 			year: "numeric",
@@ -120,15 +96,56 @@ confirmAddButton.addEventListener("click", () => {
 			hour: "2-digit",
 			minute: "2-digit",
 		});
-		tasksRef.child(currentCard.id).set({
-			course: inputs[0],
-			name: inputs[1],
-			due: date.getTime(),
-		});
+
+		firebase
+			.database()
+			.ref("tasks/" + uid)
+			.child(currentCard.id)
+			.set({
+				course: inputs[0],
+				name: inputs[1],
+				due: date.getTime(),
+			});
 	}
 
 	toggleDisplay();
 });
+
+function addCardDisplay(inputs) {
+	const card = document.createElement("div");
+	card.className = "card";
+
+	card.innerHTML = justKillMeAlready();
+
+	const textDiv = card.querySelector(".card-text");
+
+	textDiv.querySelector(".course").innerText = inputs[0];
+	textDiv.querySelector("h3").innerText = inputs[1];
+
+	const date = new Date(inputs[2]);
+
+	textDiv.querySelector(".due").innerText = date.toLocaleTimeString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+
+	const check = card.querySelector(".check");
+	check.addEventListener("click", () => {
+		handleCardClick(check);
+	});
+
+	const edit = card.querySelector(".edit");
+	edit.addEventListener("click", () => {
+		handleEdit(edit);
+	});
+
+	container.append(card);
+
+	return card;
+}
 
 function handleEdit(edit) {
 	const card = edit.parentElement.parentElement;
@@ -170,6 +187,13 @@ function toggleDisplay() {
 
 function handleCardClick(check) {
 	const card = check.parentElement.parentElement;
+
+	firebase
+		.database()
+		.ref("tasks/" + uid)
+		.child(card.id)
+		.remove();
+
 	const style = card.style;
 	style.transition = "opacity 1s";
 	style.opacity = "0";

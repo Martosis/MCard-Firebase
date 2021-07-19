@@ -50,7 +50,13 @@ nav button:hover {
 	padding-top: 10px;
 }
 
-#container:empty:after {
+.loading:empty:after {
+	font-size: 1.3em;
+	color: var(--card-secondary-color);
+	content: "Loading...";
+}
+
+.loaded:empty:after {
 	font-size: 1.3em;
 	color: var(--card-secondary-color);
 	content: "You don't have any tasks! Click the plus icon to add one!";
