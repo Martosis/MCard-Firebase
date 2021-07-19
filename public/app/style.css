@@ -1,0 +1,218 @@
+@font-face {
+	font-family: "Kollektif";
+	src: url("fonts/Kollektif-Bold.ttf");
+	font-weight: bold;
+}
+
+:root {
+	--navbar-color: #5e7e4d;
+	--background-color: #c0c4bc;
+	--card-background-color: #efefef;
+	--card-primary-color: #000;
+	--card-secondary-color: #555;
+	--card-bookmark-color: #569341;
+	--icon-default: #808080;
+	--hover-color: #555;
+}
+
+body {
+	margin: 0;
+	background: var(--background-color);
+	font-family: "Inter", sans-serif;
+}
+
+nav {
+	display: flex;
+	background: var(--navbar-color);
+	padding: 20px 35px;
+	justify-content: space-between;
+	align-items: center;
+}
+
+nav button {
+	background-color: transparent;
+	border: 2px white solid;
+	padding: 15px 20px;
+	color: white;
+	font-size: 1em;
+	transition: 500ms ease;
+}
+
+nav button:hover {
+	background-color: hsl(99, 24%, 35%);
+}
+
+#container {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	overflow-x: hidden;
+	padding-top: 10px;
+}
+
+#container:empty:after {
+	font-size: 1.3em;
+	color: var(--card-secondary-color);
+	content: "You don't have any tasks! Click the plus icon to add one!";
+}
+
+h2 {
+	font-family: "Kollektif";
+	font-size: 3em;
+	color: var(--card-secondary-color);
+	margin: 20px;
+	text-align: center;
+}
+
+.card {
+	background: var(--card-background-color);
+	width: 40%;
+	border-radius: 10px;
+	padding-left: 20px;
+	padding-right: 10px;
+	justify-content: space-between;
+	border-right: 20px var(--card-bookmark-color) solid;
+	transition: box-shadow 500ms ease;
+	margin-bottom: 20px;
+	font-family: "PT Sans";
+}
+
+.card:hover {
+	box-shadow: 0px 8px 5px rgba(0, 0, 0, 0.25);
+	transform: scale(1.05);
+}
+
+.card h3 {
+	margin: 0;
+	font-size: 2em;
+}
+
+.card .course {
+	color: var(--card-secondary-color);
+	margin-bottom: 0;
+}
+
+.card .due {
+	color: var(--card-secondary-color);
+	margin-top: 10px;
+}
+
+#plus {
+	position: fixed;
+	bottom: 1em;
+	right: 1em;
+}
+
+#plus path {
+	fill: var(--icon-default);
+	transition: 500ms ease;
+}
+
+#plus:hover path {
+	fill: var(--hover-color);
+}
+
+.card-text {
+	float: left;
+}
+
+.card-icons {
+	float: right;
+	padding-top: 8px;
+}
+
+.background {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 2;
+	justify-content: center;
+	align-items: center;
+}
+
+.add-menu {
+	width: 50%;
+	height: 50%;
+	max-width: 1000px;
+	max-height: 800px;
+	min-width: 800px;
+	min-height: 450px;
+	background-color: white;
+	border-radius: 20px;
+	z-index: 5;
+	padding: 60px 20px 30px 20px;
+}
+
+.form {
+	float: left;
+}
+
+.menu-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	float: right;
+	justify-content: space-between;
+	height: 100%;
+}
+
+.menu-right svg {
+	display: block;
+}
+
+.menu-right button {
+	width: 80%;
+	height: 20%;
+	border-radius: 10px;
+	background: var(--navbar-color);
+	border: none;
+	color: white;
+	font-family: Inter;
+	font-size: 2em;
+	font-weight: bold;
+	transition: 500ms;
+}
+
+.menu-right button:hover {
+	background-color: hsl(99, 24%, 35%);
+}
+
+.add-menu input {
+	display: block;
+	margin-bottom: 40px;
+	padding: 20px 0px;
+	width: 100%;
+	border: 0px;
+	border-bottom: 2px solid black;
+	font-family: Inter;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.add-menu input:focus {
+	outline: none;
+	border-bottom-color: black;
+}
+
+.add-menu input:focus::placeholder {
+	color: black;
+}
+
+.check path {
+	transition-duration: 500ms;
+}
+
+.check:hover path {
+	fill: green;
+}
+
+.edit path {
+	transition-duration: 500ms;
+}
+
+.edit:hover path {
+	fill: #808080;
+}
