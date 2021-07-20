@@ -8,28 +8,38 @@ const container = document.querySelector("#container");
 const logoutButton = document.querySelector("#logout");
 
 var uid;
+var fcmToken;
 
 let currentCard = null;
 
-firebase.messaging().getToken({
-	vapidKey:
-		"BIgSdQPWwlFHj3XMWX8EMgMx1k5OnMR_Ajc4z9mmjaij_StiySJlg6hxQNdXBTUufi0uXew5nQDrORcAmS3Bl_I",
-});
-
 firebase.messaging().onMessage((payload) => {
-	const notification = new Notification(payload.notification.title, {
-		body: payload.notification.body,
-	});
+	if (!document.hidden) {
+		const notification = new Notification(payload.notification.title, {
+			body: payload.notification.body,
+		});
 
-	// close the notification after 10 seconds
-	setTimeout(() => {
-		notification.close();
-	}, 5 * 1000);
+		setTimeout(() => {
+			notification.close();
+		}, 5000);
+	}
 });
 
 firebase.auth().onAuthStateChanged((user) => {
 	if (user) {
 		uid = user.uid;
+
+		firebase
+			.messaging()
+			.getToken({
+				vapidKey:
+					"BIgSdQPWwlFHj3XMWX8EMgMx1k5OnMR_Ajc4z9mmjaij_StiySJlg6hxQNdXBTUufi0uXew5nQDrORcAmS3Bl_I",
+			})
+			.then((token) => {
+				fcmToken = token;
+				firebase.firestore().collection("devices").doc(token).set({
+					id: uid,
+				});
+			});
 
 		var tasks = firebase
 			.database()
@@ -47,10 +57,17 @@ firebase.auth().onAuthStateChanged((user) => {
 
 logoutButton.addEventListener("click", () => {
 	firebase
-		.auth()
-		.signOut()
+		.firestore()
+		.collection("devices")
+		.doc(fcmToken)
+		.delete()
 		.then(() => {
-			window.location = "../";
+			firebase
+				.auth()
+				.signOut()
+				.then(() => {
+					window.location = "../";
+				});
 		});
 });
 
@@ -92,13 +109,26 @@ confirmAddButton.addEventListener("click", () => {
 	const date = new Date(inputs[2]);
 
 	if (currentCard == null) {
-		firebase
+		const key = firebase
 			.database()
 			.ref("tasks/" + uid)
 			.push({
 				course: inputs[0],
 				name: inputs[1],
 				due: date.getTime(),
+			}).key;
+
+		firebase
+			.firestore()
+			.collection("tasks")
+			.doc(key)
+			.set({
+				worker: "notification",
+				performAt: firebase.firestore.Timestamp.fromDate(date),
+				options: {
+					userId: uid,
+					taskId: key,
+				},
 			});
 	} else {
 		const textDiv = currentCard.querySelector(".card-text");
@@ -121,6 +151,19 @@ confirmAddButton.addEventListener("click", () => {
 				course: inputs[0],
 				name: inputs[1],
 				due: date.getTime(),
+			});
+
+		firebase
+			.firestore()
+			.collection("tasks")
+			.doc(currentCard.id)
+			.set({
+				worker: "notification",
+				performAt: firebase.firestore.Timestamp.fromDate(date),
+				options: {
+					userId: uid,
+					taskId: currentCard.id,
+				},
 			});
 	}
 
@@ -208,7 +251,10 @@ function handleCardClick(check) {
 		.database()
 		.ref("tasks/" + uid)
 		.child(card.id)
-		.remove();
+		.remove()
+		.catch((_) => {});
+
+	firebase.firestore().collection("tasks").doc(card.id).delete();
 
 	const style = card.style;
 	style.transition = "opacity 1s";
