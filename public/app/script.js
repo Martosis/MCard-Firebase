@@ -68,6 +68,14 @@ logoutButton.addEventListener("click", () => {
 				.then(() => {
 					window.location = "../";
 				});
+		})
+		.catch(() => {
+			firebase
+				.auth()
+				.signOut()
+				.then(() => {
+					window.location = "../";
+				});
 		});
 });
 
