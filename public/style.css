@@ -1,5 +1,7 @@
 body {
 	background: #5e7e4d;
+	overflow: hidden;
+	margin-top: 0;
 }
 
 #container {
@@ -41,4 +43,35 @@ button:hover {
 	bottom: 32px;
 	width: 30%;
 	height: auto;
+}
+
+#mobile-only {
+	display: none;
+	font-family: Inter;
+	color: white;
+	height: 100vh;
+}
+
+#browser-not-supported {
+	font-family: Inter;
+	color: white;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+@media only screen and (max-width: 760px) {
+	#content,
+	#browser-not-supported {
+		display: none;
+	}
+	#mobile-only {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+	}
 }
